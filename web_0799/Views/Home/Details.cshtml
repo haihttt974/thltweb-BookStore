@@ -1,0 +1,21 @@
+﻿@model web_0799.Models.Product
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<div class="card mb-3">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img src="@Model.ImageUrl" class="img-fluid rounded-start" alt="@Model.Name" />
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h3 class="card-title">@Model.Name</h3>
+                <p class="card-text"><strong>Giá:</strong> @Model.Price.ToString("N0") đ</p>
+                <p class="card-text"><strong>Mô tả:</strong> @Model.Description</p>
+                <p class="card-text"><strong>Danh mục:</strong> @Model.Category?.Name</p>
+            </div>
+        </div>
+    </div>
+</div>
+<a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Quay lại</a>

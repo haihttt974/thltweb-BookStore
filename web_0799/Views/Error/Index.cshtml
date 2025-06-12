@@ -1,0 +1,15 @@
+﻿@model web_0799.Models.ErrorViewModel
+
+@{
+    ViewData["Title"] = "Lỗi hệ thống";
+}
+
+<h1 class="text-danger">Đã xảy ra lỗi.</h1>
+<p>Xin lỗi, có sự cố xảy ra khi xử lý yêu cầu của bạn.</p>
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Mã yêu cầu:</strong> <code>@Model.RequestId</code>
+    </p>
+}

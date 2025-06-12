@@ -1,0 +1,49 @@
+﻿@model IEnumerable<web_0799.Models.Product>
+@{
+    ViewData["Title"] = "Product List";
+}
+<h1>Product List</h1>
+<a class="btn btn-primary mb-3" asp-action="Create">Add Product</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Price.ToString("N0")</td>
+                <td>@item.Description</td>
+                <td>@item.Category?.Name</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        <img src="@item.ImageUrl" width="100" />
+                    }
+                </td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        <a asp-action="Edit" class="btn btn-secondary" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" class="btn btn-info" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" class="btn btn-danger" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a asp-action="Details" class="btn btn-info" asp-route-id="@item.Id">Details</a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

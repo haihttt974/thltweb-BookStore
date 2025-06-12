@@ -1,0 +1,15 @@
+﻿@model web_0799.Models.ErrorViewModel
+
+@{
+    ViewData["Title"] = "Lỗi máy chủ";
+}
+
+<h1 class="text-danger">500 - Lỗi máy chủ</h1>
+<p>Đã xảy ra lỗi nội bộ trong máy chủ. Vui lòng thử lại sau.</p>
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Mã yêu cầu:</strong> <code>@Model.RequestId</code>
+    </p>
+}

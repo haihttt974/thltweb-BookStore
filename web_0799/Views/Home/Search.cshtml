@@ -1,0 +1,32 @@
+﻿@model List<web_0799.Models.Product>
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Search Results for "@ViewBag.Query"</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">No products found matching your search.</div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var product in Model)
+            {
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="/@(product.Images?.FirstOrDefault()?.Url ?? "/images/no-image.png")"
+                             class="card-img-top" alt="@product.Name" style="height:200px; object-fit:cover;" />
+                        <div class="card-body">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text">@product.Description?.Substring(0, Math.Min(100, product.Description.Length))...</p>
+                            <a href="@Url.Action("Details", "Products", new { id = product.Id })" class="btn btn-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

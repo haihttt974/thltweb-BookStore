@@ -1,0 +1,53 @@
+﻿@model web_0799.Models.ErrorViewModel
+
+@{
+    ViewData["Title"] = "Không tìm thấy trang";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // sửa nếu bạn dùng layout khác
+}
+
+<!-- Bootstrap 5 + GSAP animation -->
+<div class="container text-center py-5">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-6">
+            <img id="lostImage" src="https://assets10.lottiefiles.com/packages/lf20_j1adxtyb.json" class="img-fluid" alt="Not Found Animation" />
+        </div>
+        <div class="col-md-6">
+            <h1 class="display-4 text-danger mb-3" id="title">404 - Không tìm thấy trang</h1>
+            <p class="lead mb-4" id="description">
+                Trang bạn đang tìm không tồn tại hoặc đã bị xóa. Vui lòng kiểm tra lại địa chỉ.
+            </p>
+            @if (Model.ShowRequestId)
+            {
+                <p>
+                    <small class="text-muted">Mã yêu cầu: <code>@Model.RequestId</code></small>
+                </p>
+            }
+            <a href="/" class="btn btn-primary btn-lg mt-3">Quay lại trang chủ</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Lottie Player CDN -->
+    <script src="https://unpkg.com/@@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <script>
+        // Replace image with animated lottie player
+        const lostImage = document.getElementById('lostImage');
+        const lottiePlayer = document.createElement('lottie-player');
+        lottiePlayer.setAttribute('src', 'https://assets1.lottiefiles.com/packages/lf20_3z6v9g1c.json');
+        lottiePlayer.setAttribute('background', 'transparent');
+        lottiePlayer.setAttribute('speed', '1');
+        lottiePlayer.setAttribute('style', 'width: 100%; height: 300px;');
+        lottiePlayer.setAttribute('loop', '');
+        lottiePlayer.setAttribute('autoplay', '');
+        lostImage.replaceWith(lottiePlayer);
+
+        // GSAP animation
+        gsap.from("#title", { duration: 1, y: -50, opacity: 0, ease: "bounce.out" });
+        gsap.from("#description", { duration: 1, delay: 0.5, x: -100, opacity: 0 });
+        gsap.from(".btn", { duration: 1, delay: 1, scale: 0.5, opacity: 0, ease: "elastic.out(1, 0.3)" });
+    </script>
+}

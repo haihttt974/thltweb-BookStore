@@ -1,0 +1,130 @@
+﻿@model web_0799.Models.Product
+@using System.Globalization
+@{
+    ViewData["Title"] = "Update Product";
+}
+
+<h2>Update Product</h2>
+
+<form asp-action="Update" enctype="multipart/form-data" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Price" class="form-label"></label>
+        <input asp-for="Price" class="form-control"
+               value="@Model.Price.ToString("0.##", CultureInfo.InvariantCulture)"
+               placeholder="Ví dụ: 199.99" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <!-- Ảnh đại diện chính -->
+    <div class="mb-3">
+        <label class="form-label" for="imageInput">Main Image</label>
+        <input type="file" name="imageUrl" id="imageInput" class="form-control" />
+        <img src="@Model.ImageUrl" alt="Current Image" id="previewImage" style="max-width: 200px;" class="mt-2" />
+    </div>
+
+    <!-- Ảnh phụ mới -->
+    <div class="mb-3">
+        <label class="form-label" for="additionalImages">Gallery Images (Add new)</label>
+        <input type="file" name="additionalImages" id="additionalImages" class="form-control" multiple />
+    </div>
+
+    <!-- Hiển thị ảnh phụ hiện có -->
+    @if (Model.Images != null && Model.Images.Any())
+    {
+        <div class="mb-3">
+            <label class="form-label">Existing Gallery Images:</label>
+            <div class="row" id="galleryContainer">
+                @foreach (var img in Model.Images)
+                {
+                    <div class="col-3 mb-2" id="image-@img.Id">
+                        <div class="position-relative">
+                            <img src="@img.Url" class="img-thumbnail" style="width: 100%; height: auto;" />
+                            <button type="button"
+                                    class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 delete-image-btn"
+                                    data-image-id="@img.Id">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Preview main image khi thay đổi file input
+        document.getElementById("imageInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("previewImage").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById("imageInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("previewImage").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Xử lý nút xóa ảnh phụ
+        document.querySelectorAll('.delete-image-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const imageId = this.getAttribute('data-image-id');
+                const imageDiv = document.getElementById(`image-${imageId}`);
+
+                if (confirm('Bạn có chắc chắn muốn xóa ảnh này?')) {
+                    fetch(`/Products/DeleteImage/${imageId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            imageDiv.remove();
+                        } else {
+                            alert("Xóa ảnh thất bại.");
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Có lỗi xảy ra.");
+                    });
+                }
+            });
+        });
+    </script>
+}
