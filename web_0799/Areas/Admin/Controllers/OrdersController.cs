@@ -22,7 +22,7 @@ namespace web_0799.Areas.Admin.Controllers
         // GET: Admin/Orders
         public async Task<IActionResult> Index()
         {
-            var productDBContext = _context.Orders.Include(o => o.UserId);
+            var productDBContext = _context.Orders.Include(o => o.ApplicationUser);
             return View(await productDBContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace web_0799.Areas.Admin.Controllers
             }
 
             var order = await _context.Orders
-                .Include(o => o.UserId)
+                .Include(o => o.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
@@ -57,7 +57,7 @@ namespace web_0799.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,OrderDate,TotalAmount,Status,ShippingAddress")] Order order)
+        public async Task<IActionResult> Create([Bind("Id,UserId,OrderDate,TotalPrice,ShippingAddress,Notes")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +91,7 @@ namespace web_0799.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,OrderDate,TotalAmount,Status,ShippingAddress")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,OrderDate,TotalPrice,ShippingAddress,Notes")] Order order)
         {
             if (id != order.Id)
             {
@@ -131,7 +131,7 @@ namespace web_0799.Areas.Admin.Controllers
             }
 
             var order = await _context.Orders
-                .Include(o => o.UserId)
+                .Include(o => o.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
