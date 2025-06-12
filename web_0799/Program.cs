@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using web_0799.Models;
 using web_0799.Repositories;
@@ -13,17 +13,28 @@ namespace web_0799
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddDbContext<ProductDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ST5")));
 
-            //builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ProductDBContext>();
+            // Thêm dịch vụ session
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout của session
+                options.Cookie.HttpOnly = true; // Cookie chỉ cho HTTP
+                options.Cookie.IsEssential = true; // Cookie thiết yếu (cho GDPR)
+            });
 
-            //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ProductDBContext>();
+            // Cấu hình DbContext
+            builder.Services.AddDbContext<ProductDBContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("ST5")));
+
+            // Cấu hình Identity
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddDefaultTokenProviders()
                 .AddDefaultUI()
                 .AddEntityFrameworkStores<ProductDBContext>();
 
-            builder.Services.ConfigureApplicationCookie(options => {
+            // Cấu hình cookie cho Identity
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
                 options.LoginPath = $"/Identity/Account/Login";
                 options.LogoutPath = $"/Identity/Account/Logout";
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
@@ -31,6 +42,7 @@ namespace web_0799
 
             builder.Services.AddRazorPages();
 
+            // Đăng ký repository
             builder.Services.AddScoped<IProductRepository, EFProductRepository>();
             builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 
@@ -40,14 +52,17 @@ namespace web_0799
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseExceptionHandler("/Error");
             app.UseStatusCodePagesWithReExecute("/Error/{0}");
-            app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            // Sử dụng session middleware (phải gọi sau UseStaticFiles và trước UseRouting)
+            app.UseSession();
+
             app.UseRouting();
             app.UseAuthorization();
             app.MapRazorPages();

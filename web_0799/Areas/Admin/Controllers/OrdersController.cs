@@ -22,7 +22,7 @@ namespace web_0799.Areas.Admin.Controllers
         // GET: Admin/Orders
         public async Task<IActionResult> Index()
         {
-            var productDBContext = _context.Orders.Include(o => o.User);
+            var productDBContext = _context.Orders.Include(o => o.UserId);
             return View(await productDBContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace web_0799.Areas.Admin.Controllers
             }
 
             var order = await _context.Orders
-                .Include(o => o.User)
+                .Include(o => o.UserId)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
@@ -131,7 +131,7 @@ namespace web_0799.Areas.Admin.Controllers
             }
 
             var order = await _context.Orders
-                .Include(o => o.User)
+                .Include(o => o.UserId)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {

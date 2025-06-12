@@ -18,14 +18,24 @@ namespace web_0799.Controllers
             _productRepository = productRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 3)
         {
+            var totalProducts = await _context.Products.CountAsync();
+
             var products = await _context.Products
                                          .Include(p => p.Category)
                                          .Include(p => p.Images)
+                                         .OrderBy(p => p.Id)
+                                         .Skip((page - 1) * pageSize)
+                                         .Take(pageSize)
                                          .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+
             return View(products);
         }
+
 
         public async Task<IActionResult> Details(int id)
         {

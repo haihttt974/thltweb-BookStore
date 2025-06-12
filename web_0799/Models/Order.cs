@@ -1,31 +1,25 @@
-﻿using web_0799.Models;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using web_0799.Models;
 
 namespace web_0799.Models
 {
     public class Order
     {
         public int Id { get; set; }
-        [Required]
         public string UserId { get; set; }
-
-        public ApplicationUser User { get; set; }
-
-        [Required]
         public DateTime OrderDate { get; set; }
+        public decimal TotalPrice { get; set; }
 
-        [Required]
-        [Range(0.01, 1000000000000.00)]
-        public decimal TotalAmount { get; set; }
+        public string ShippingAddress { get; set; }
+        public string Notes { get; set; }
 
-        [StringLength(50)]
-        public string Status { get; set; } // Ví dụ: "Pending", "Completed", "Cancelled"
+        [ForeignKey("UserId")]
+        [ValidateNever]
+        public ApplicationUser ApplicationUser { get; set; }
 
-        [StringLength(300)]
-        public string? ShippingAddress { get; set; }
-        
-        public List<OrderDetail>? OrderDetails { get; set; }
+        public List<OrderDetail> OrderDetails { get; set; }
     }
 }
 

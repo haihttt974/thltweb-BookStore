@@ -38,12 +38,7 @@
                             </a>
                         </li>
                     </ul>
-                    <form class="d-flex">
-                        <button class="btn btn-outline-dark" type="submit">
-                            <i class="bi-cart-fill me-1"></i>
-                            Cart
-                        </button>
-                    </form>
+                    @await Component.InvokeAsync("CartItemCount")
                     <partial name="_LoginPartial"/>
                     @* <form class="d-flex" asp-controller="Home" asp-action="Search" method="get">
                         <input name="query" class="form-control me-2" type="search" placeholder="Search products..." />

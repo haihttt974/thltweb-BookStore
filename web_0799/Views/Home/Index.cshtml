@@ -1,6 +1,8 @@
 ﻿@model List<web_0799.Models.Product>
 @{
-    ViewData["Title"] = "Danh sách sản phẩm";
+    ViewData["Title"] = "Home page";
+    int numOfQuantity = 1;
+
 }
 
 <h2 class="mb-4">Danh sách sản phẩm</h2>
@@ -16,10 +18,14 @@
                     <p class="card-text text-muted">@item.Category?.Name</p>
                     <p class="card-text">@item.Price.ToString("N0") đ</p>
                     <div class="d-flex justify-content-end">
-                        <button class="btn btn-outline-dark" type="submit">
-                            <i class="bi-cart-fill me-1"></i>
-                            Add to Cart
-                        </button>
+                        <a asp-controller="ShoppingCart"
+                           asp-action="AddToCart"
+                           asp-route-productId="@item.Id"
+                           asp-route-quantity="@numOfQuantity">
+                            <button class="btn btn-outline-dark">
+                                <i class="bi-cart-fill me-1"></i> Add to Cart
+                            </button>
+                        </a>
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
                             <i class="bi bi-eye"></i> <!-- Bootstrap icon -->
                         </a>
@@ -29,3 +35,13 @@
         </div>
     }
 </div>
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

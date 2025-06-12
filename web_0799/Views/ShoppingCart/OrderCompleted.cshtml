@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "Đặt hàng thành công";
+    var orderId = ViewBag.OrderId;
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h2 class="mb-0">Đặt hàng thành công</h2>
+        </div>
+        <div class="card-body">
+            <p>Cảm ơn bạn đã đặt hàng! Đơn hàng của bạn đã được ghi nhận.</p>
+            <p><strong>Mã đơn hàng:</strong> #@orderId</p>
+            <p>Chúng tôi sẽ liên hệ với bạn sớm để xác nhận và giao hàng.</p>
+            <div class="d-flex justify-content-between">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Tiếp tục mua sắm</a>
+                <a asp-controller="ShoppingCart" asp-action="Index" class="btn btn-secondary">Xem giỏ hàng</a>
+            </div>
+        </div>
+    </div>
+</div>

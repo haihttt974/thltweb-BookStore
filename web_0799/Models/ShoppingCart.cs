@@ -1,13 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using web_0799.Models;
 
-namespace web_0799.Models
+public class ShoppingCart
 {
-    public class ShoppingCart
+    public List<CartItem> Items { get; set; } = new List<CartItem>();
+
+    public void AddItem(CartItem item)
     {
-        public int Id { get; set; }
-        [Required]
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
-        public List<CartItem> CartItems { get; set; }
+        var existingItem = Items.FirstOrDefault(i => i.ProductId == item.ProductId);
+        if (existingItem != null)
+        {
+            existingItem.Quantity += item.Quantity;
+        }
+        else
+        {
+            Items.Add(item);
+        }
     }
+
+    public void RemoveItem(int productId)
+    {
+        Items.RemoveAll(i => i.ProductId == productId);
+    }
+
+    // Bạn có thể thêm các phương thức khác như TínhTổngTiền(), CậpNhậtSốLượng(), XóaHếtGiỏHàng()...
 }
