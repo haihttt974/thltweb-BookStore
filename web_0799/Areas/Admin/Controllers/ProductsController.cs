@@ -53,14 +53,25 @@ namespace web_0799.Areas.Admin.Controllers
         }
 
         // POST: Admin/Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,Description,ImageUrl,CategoryId")] Product product)
+        public async Task<IActionResult> Create([Bind("Name,Price,Description,CategoryId")] Product product, IFormFile ImageFile)
         {
             if (ModelState.IsValid)
             {
+                if (ImageFile != null && ImageFile.Length > 0)
+                {
+                    // Define the path to save the image (e.g., wwwroot/images)
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+                    // Save the relative path to ImageUrl
+                    product.ImageUrl = "/images/" + fileName;
+                }
+
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -87,11 +98,9 @@ namespace web_0799.Areas.Admin.Controllers
         }
 
         // POST: Admin/Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Description,ImageUrl,CategoryId")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Description,ImageUrl,CategoryId")] Product product, IFormFile ImageFile)
         {
             if (id != product.Id)
             {
@@ -102,6 +111,28 @@ namespace web_0799.Areas.Admin.Controllers
             {
                 try
                 {
+                    // Handle file upload if a new image is provided
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        // Validate file type
+                        var validImageTypes = new[] { "image/jpeg", "image/png", "image/gif" };
+                        if (!validImageTypes.Contains(ImageFile.ContentType))
+                        {
+                            ModelState.AddModelError("ImageFile", "Chỉ chấp nhận file JPEG, PNG hoặc GIF.");
+                            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+                            return View(product);
+                        }
+
+                        // Save the new image
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(stream);
+                        }
+                        product.ImageUrl = "/images/" + fileName; // Update ImageUrl with new path
+                    }
+
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
@@ -150,9 +181,8 @@ namespace web_0799.Areas.Admin.Controllers
             if (product != null)
             {
                 _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

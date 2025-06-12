@@ -1,62 +1,117 @@
 ﻿@model List<web_0799.Models.ApplicationUser>
 
 @{
-    ViewData["Title"] = "User Management";
+    ViewData["Title"] = "Quản lý người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<div class="content-header">
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="m-0 text-dark">User Management</h1>
-            @* <a href="#" class="btn btn-primary btn-sm">
-                <i class="fas fa-user-plus me-1"></i> Add New User
-            </a> *@
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Quản lý người dùng</h2>
+        @* <a asp-action="Create" asp-controller="Admin" class="btn btn-primary">
+            <i class="bi bi-user-plus me-1"></i> Thêm người dùng
+        </a> *@
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title"><i class="bi bi-people me-1"></i> Danh sách người dùng</h3>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover table-striped text-center align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Email</th>
+                                <th>Họ và tên</th>
+                                <th>Địa chỉ</th>
+                                <th>Số điện thoại</th>
+                                <th>Tuổi</th>
+                                <th>Vai trò</th>
+                                <th>Hành động</th>
+                                <th>Phân quyền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model)
+                            {
+                                var currentRoleName = ViewBag.UserRoles.ContainsKey(user.Id) ? ViewBag.UserRoles[user.Id] : null;
+                                <tr>
+                                    <td>@user.Email</td>
+                                    <td>@user.FullName</td>
+                                    <td>@(string.IsNullOrEmpty(user.Address) ? "N/A" : user.Address)</td>
+                                    <td>@(string.IsNullOrEmpty(user.PhoneNumber) ? "N/A" : user.PhoneNumber)</td>
+                                    <td>@(!string.IsNullOrWhiteSpace(user.Age) ? user.Age : "N/A")</td>
+                                    <td>
+                                        <span class="badge bg-info" id="roleBadge_@user.Id">
+                                            @(currentRoleName ?? "Không có")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-action="Details" asp-controller="Admin" asp-route-id="@user.Id" class="btn btn-info btn-sm">
+                                            <i class="bi bi-eye"></i> Chi tiết
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" onchange="assignRole('@user.Id', this)">
+                                            <option value="" @@(currentRoleName= =null ? "selected" : "" )>-- Choose Role --</option>
+                                            @foreach (var role in ViewBag.Roles)
+                                            {
+                                                <option value="@role.Id" @@(currentRoleName == role.Name ? "selected" : "")>@role.Name</option>
+                                            }
+                                        </select>
+                                    </td>
+                                </tr>
+                            }
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-muted py-4">Không tìm thấy người dùng.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<section class="content">
-    <div class="container-fluid">
-        <div class="card shadow-sm">
-            <div class="card-header bg-gradient-primary text-white">
-                <h3 class="card-title"><i class="fas fa-users me-1"></i> User List</h3>
-            </div>
-            <div class="card-body table-responsive p-0">
-                <table class="table table-hover table-striped text-center">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Email</th>
-                            <th>Full Name</th>
-                            <th>Address</th>
-                            <th>Age</th>
-                            <th>Role</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var user in Model)
-                        {
-                            <tr>
-                                <td>@user.Email</td>
-                                <td>@user.FullName</td>
-                                <td>@(string.IsNullOrEmpty(user.Address) ? "N/A" : user.Address)</td>
-                                <td>@(!string.IsNullOrWhiteSpace(user.Age) ? user.Age : "N/A")</td>
-                                <td>
-                                    <span class="badge bg-info">
-                                        @(ViewBag.UserRoles.ContainsKey(user.Id) ? ViewBag.UserRoles[user.Id] : "None")
-                                    </span>
-                                </td>
-                            </tr>
-                        }
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="5" class="text-muted py-4">No users found.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</section>
+@section Scripts {
+    <script>
+        function assignRole(userId, selectElement) {
+            const roleId = selectElement.value;
+            const badge = document.getElementById(`roleBadge_${userId}`);
+            const formData = new FormData();
+            formData.append('id', userId);
+            formData.append('roleId', roleId);
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+            fetch(`/Admin/Admin/AssignRole/${userId}`, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the role badge
+                        badge.textContent = roleId ? selectElement.options[selectElement.selectedIndex].text : 'Không có';
+                        alert(data.message);
+                    } else {
+                        alert('Có lỗi xảy ra khi phân quyền.');
+                        // Revert dropdown selection
+                        selectElement.value = badge.dataset.originalValue || '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi khi phân quyền.');
+                    selectElement.value = badge.dataset.originalValue || '';
+                });
+
+            // Store the original role for potential revert
+            badge.dataset.originalValue = roleId;
+        }
+    </script>
+}

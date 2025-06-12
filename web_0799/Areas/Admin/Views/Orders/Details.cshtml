@@ -1,49 +1,44 @@
 ﻿@model web_0799.Models.Order
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết đơn hàng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary">Chi tiết đơn hàng</h2>
 
-<div>
-    <h4>Order</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OrderDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OrderDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TotalPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TotalPrice)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingAddress)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Notes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Notes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ApplicationUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApplicationUser.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3 fw-bold">Ngày đặt hàng</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.OrderDate)</dd>
+
+                        <dt class="col-sm-3 fw-bold">Tổng tiền</dt>
+                        <dd class="col-sm-9">@Model.TotalPrice.ToString("N0") đ</dd>
+
+                        <dt class="col-sm-3 fw-bold">Địa chỉ giao hàng</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.ShippingAddress)</dd>
+
+                        <dt class="col-sm-3 fw-bold">Ghi chú</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
+
+                        <dt class="col-sm-3 fw-bold">Người đặt</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.ApplicationUser.FullName)</dd>
+                    </dl>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning px-4">
+                            <i class="bi bi-pencil"></i> Sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
