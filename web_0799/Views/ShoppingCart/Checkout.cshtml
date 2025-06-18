@@ -1,4 +1,5 @@
-﻿@model web_0799.ViewModels.CheckoutViewModel
+﻿@using System.Text.Json
+@model web_0799.ViewModels.CheckoutViewModel
 @using System.Globalization
 @{
     var culture = new CultureInfo("vi-VN");
@@ -38,7 +39,7 @@
                                 <td>@item.Name</td>
                                 <td>@item.Quantity</td>
                                 <td>@item.Price.ToString("N0", culture) ₫</td>
-                                <td>@(item.Price * item.Quantity) ₫</td>
+                                <td>@(item.Price * item.Quantity).ToString("N0", culture) ₫</td>
                             </tr>
                         }
                     </tbody>
@@ -64,17 +65,21 @@
                 <h4 class="mb-0">Thông tin thanh toán</h4>
             </div>
             <div class="card-body">
-                <form asp-action="Checkout" method="post">
+                <form asp-action="Checkout" asp-antiforgery="true" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
                     <div class="form-group mb-3">
                         <label asp-for="Order.ShippingAddress" class="form-label">Địa chỉ giao hàng</label>
                         <input asp-for="Order.ShippingAddress" class="form-control" placeholder="Nhập địa chỉ giao hàng" />
                         <span asp-validation-for="Order.ShippingAddress" class="text-danger"></span>
                     </div>
+
                     <div class="form-group mb-3">
                         <label asp-for="Order.Notes" class="form-label">Ghi chú</label>
                         <textarea asp-for="Order.Notes" class="form-control" rows="4" placeholder="Nhập ghi chú (nếu có)"></textarea>
                         <span asp-validation-for="Order.Notes" class="text-danger"></span>
                     </div>
+
                     <div class="d-flex justify-content-between">
                         <a asp-controller="ShoppingCart" asp-action="Index" class="btn btn-secondary">Quay lại giỏ hàng</a>
                         <button type="submit" class="btn btn-success">Xác nhận đơn hàng</button>
@@ -85,27 +90,13 @@
     }
 </div>
 
-<!-- Thêm Toastify để hiển thị thông báo -->
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<!-- Toastify -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-<!-- Thêm jQuery và validation scripts -->
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
-    @if (TempData["Message"] != null)
-    {
-        <script>
-            console.log("Message: @TempData["Message"], MessageType: @TempData["MessageType"]");
-            Toastify({
-                text: "@TempData["Message"]",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "@(TempData["MessageType"] == "Success" ? "#28a745" : "#dc3545")",
-                stopOnFocus: true
-            }).showToast();
-        </script>
-    }
+    @await Html.PartialAsync("_Toast")
 }

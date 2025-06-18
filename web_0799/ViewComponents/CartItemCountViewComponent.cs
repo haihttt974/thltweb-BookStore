@@ -1,16 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using web_0799.Extensions;
+using Microsoft.AspNetCore.Identity;
 using web_0799.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace web_0799.ViewComponents
+public class CartItemCountViewComponent : ViewComponent
 {
-    public class CartItemCountViewComponent : ViewComponent
+    private readonly ProductDBContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public CartItemCountViewComponent(ProductDBContext context, UserManager<ApplicationUser> userManager)
     {
-        public IViewComponentResult Invoke()
+        _context = context;
+        _userManager = userManager;
+    }
+
+    public async Task<IViewComponentResult> InvokeAsync()
+    {
+        if (!User.Identity.IsAuthenticated)
         {
-            var cart = HttpContext.Session.GetObjectFromJson<ShoppingCart>("Cart") ?? new ShoppingCart();
-            int itemCount = cart.Items.Sum(i => i.Quantity);
-            return View(itemCount);
+            return View(0);
         }
+
+        var user = await _userManager.GetUserAsync(HttpContext.User);
+        var count = await _context.CartItems
+            .Where(i => i.UserId == user.Id)
+            .SumAsync(i => i.Quantity);
+
+        return View(count);
     }
 }
